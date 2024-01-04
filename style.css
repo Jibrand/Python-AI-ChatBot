@@ -1,4 +1,4 @@
-/* Import Google font - Poppins */
+  /* Import Google font - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 * {
   margin: 0;
@@ -6,8 +6,22 @@
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 } 
+.loading-indicator{
+font-size: 55px;
+}
 .robot{
-  margin-bottom: 40px !important
+  margin-bottom: 40px !important;
+  width: 32px;
+  height: 32px;
+  /* padding-top: 10px !important; */
+  color: #fff;
+  cursor: default;
+  text-align: center;
+  line-height: 32px;
+  align-self: flex-end;
+  background: red;
+  border-radius: 4px;
+  margin: 0px 10px 7px 0px;
 }    
 .chatbot-toggler {
   position: fixed;
@@ -194,3 +208,6 @@ header h2 {
     display: block;
   }
 }
+
+
+ 
