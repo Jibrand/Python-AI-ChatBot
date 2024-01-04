@@ -1,4 +1,4 @@
-const chatbotToggler = document.querySelector(".chatbot-toggler");
+  const chatbotToggler = document.querySelector(".chatbot-toggler");
 const closeBtn = document.querySelector(".close-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatInput = document.querySelector(".chat-input textarea");
@@ -12,15 +12,39 @@ const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
-    let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined robot">smart_toy</span><p></p>`;
-    chatLi.innerHTML = chatContent;
-    chatLi.querySelector("p").textContent = message;
+
+    if (className === "outgoing") {
+        let chatContent = `<p></p>`;
+        chatLi.innerHTML = chatContent;
+        chatLi.querySelector("p").textContent = message;
+    } else if (className === "loading") {
+        chatLi.innerHTML = `<div class="loading-indicator">...</div>`;
+    } else {
+        let chatContent = `<span class="material-symbols-outlined robot">smart_toy</span><p></p>`;
+        chatLi.innerHTML = chatContent;
+        chatLi.querySelector("p").textContent = message;
+    }
+
     return chatLi; // return chat <li> element
 }
 
- 
-// Modify the generateResponse function to directly update the chatbox
+
+const showLoadingIndicator = () => {
+    const loadingLi = createChatLi("Loading...", "loading");
+    chatbox.appendChild(loadingLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+}
+
+const hideLoadingIndicator = () => {
+    const loadingLi = chatbox.querySelector(".loading");
+    if (loadingLi) {
+        loadingLi.remove();
+    }
+}
+
 const generateResponse = (chatElement) => {
+    showLoadingIndicator(); // Show loading indicator before making the API call
+
     const API_URL = "https://puthon-chabot.onrender.com/ask";
     const messageElement = chatElement.querySelector("p");
 
@@ -37,6 +61,7 @@ const generateResponse = (chatElement) => {
     fetch(API_URL, requestOptions)
         .then(response => {
             console.log('API Response Status:', response.status);
+            hideLoadingIndicator(); // Hide loading indicator after receiving the response
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -50,7 +75,11 @@ const generateResponse = (chatElement) => {
                 throw new Error('Invalid response format from the backend.');
             }
 
-            const cleanedResponse = data.answer.replace(/(^\?\s*|\s*$)/g, '');
+            // Remove "Answer: " prefix and extract content after the "?" character
+            let cleanedResponse = data.answer.replace(/^Answer:\s*/, ''); // Remove "Answer: " prefix
+            const index = cleanedResponse.indexOf("?");
+            cleanedResponse = index !== -1 ? cleanedResponse.slice(index + 1).trim() : cleanedResponse.trim();
+
             console.log('Cleaned Response:', cleanedResponse);
 
             // Update the chatbox with the bot's response
@@ -62,6 +91,7 @@ const generateResponse = (chatElement) => {
         })
         .catch(error => {
             console.error('Error:', error);
+            hideLoadingIndicator(); // Hide loading indicator in case of an error
             // Handle error response
             const errorLi = createChatLi("Error processing the request. Please try again.", "error-incoming");
             chatbox.appendChild(errorLi);
