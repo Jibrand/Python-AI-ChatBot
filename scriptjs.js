@@ -1,4 +1,4 @@
-  const chatbotToggler = document.querySelector(".chatbot-toggler");
+const chatbotToggler = document.querySelector(".chatbot-toggler");
 const closeBtn = document.querySelector(".close-btn");
 const chatbox = document.querySelector(".chatbox");
 const chatInput = document.querySelector(".chat-input textarea");
@@ -70,10 +70,19 @@ const generateResponse = (chatElement) => {
         })
         .then(data => {
             console.log('API Response Data:', data);
-
-            if (!data || !data.answer) {
-                throw new Error('Invalid response format from the backend.');
+            
+            if (typeof data === 'string') {
+                const incomingChatLi = createChatLi(data, "incoming");
+                chatbox.appendChild(incomingChatLi);
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+            } else {
+                // Handle other response formats if needed
+                console.error('Invalid response format from the backend.');
             }
+
+            // if (!data || !data.answer) {
+            //     throw new Error('Invalid response format from the backend.');
+            // }
 
             // Remove "Answer: " prefix and extract content after the "?" character
             let cleanedResponse = data.answer.replace(/^Answer:\s*/, ''); // Remove "Answer: " prefix
@@ -88,14 +97,16 @@ const generateResponse = (chatElement) => {
 
             // Scroll to the bottom after adding messages
             chatbox.scrollTo(0, chatbox.scrollHeight);
+            hideLoadingIndicator(); // Hide loading indicator in case of an error
+
         })
         .catch(error => {
-            console.error('Error:', error);
-            hideLoadingIndicator(); // Hide loading indicator in case of an error
-            // Handle error response
-            const errorLi = createChatLi("Error processing the request. Please try again.", "error-incoming");
-            chatbox.appendChild(errorLi);
-            chatbox.scrollTo(0, chatbox.scrollHeight);
+            // console.error('Error:', error);
+            // hideLoadingIndicator(); // Hide loading indicator in case of an error
+            // // Handle error response
+            // const errorLi = createChatLi("Error processing the request. Please try again.", "error-incoming");
+            // chatbox.appendChild(errorLi);
+            // chatbox.scrollTo(0, chatbox.scrollHeight);
         });
 }
 
